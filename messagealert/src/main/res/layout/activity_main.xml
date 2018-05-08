@@ -1,28 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".MainActivity">
-
-
-    <EditText
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:lines="10"
-        android:paddingBottom="8dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="8dp"
-        android:hint="TextView" />
-
     <Button
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_alignParentBottom="true"
         android:text="修改" />
-</LinearLayout>
+    <HorizontalScrollView android:id="@+id/tools"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/blue_700"
+        android:layout_above="@id/button2"
+        android:scrollbars="none">
+
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton android:id="@+id/bold"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_bold"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/italic"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_italic"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/underline"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_underline"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/strikethrough"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_strikethrough"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/bullet"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_bullet"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/quote"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_quote"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/link"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_insert_link"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+            <ImageButton android:id="@+id/clear"
+                android:contentDescription="@null"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@mipmap/ic_format_clear"
+                android:scaleType="center"
+                android:background="?android:selectableItemBackground">
+            </ImageButton>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <io.github.mthli.knife.KnifeText
+        android:id="@+id/knife"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/white"
+        android:gravity="top|start"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:scrollbars="vertical"
+        app:bulletColor="@color/blue_500"
+        app:bulletGapWidth="2dp"
+        app:bulletRadius="2dp"
+        app:historyEnable="true"
+        app:historySize="99"
+        app:linkColor="@color/blue_500"
+        app:linkUnderline="true"
+        app:quoteCapWidth="@dimen/quote_gap_width"
+        app:quoteColor="@color/blue_500"
+        app:quoteStripeWidth="@dimen/quote_stripe_width"></io.github.mthli.knife.KnifeText>
+
+
+    <!--<EditText-->
+        <!--android:id="@+id/textView2"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:lines="10"-->
+        <!--android:paddingBottom="8dp"-->
+        <!--android:paddingLeft="8dp"-->
+        <!--android:paddingRight="8dp"-->
+        <!--android:paddingTop="8dp"-->
+        <!--android:hint="TextView" />-->
+
+
+</RelativeLayout>
