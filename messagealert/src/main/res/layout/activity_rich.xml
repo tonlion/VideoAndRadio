@@ -1,13 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/bar"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:background="@android:color/white"
+        android:layout_height="56dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/submit"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/submit"
+                android:layout_marginRight="16dp"
+                android:layout_alignParentRight="true"/>
+            <ImageView
+                android:id="@+id/clock"
+                android:layout_toLeftOf="@id/submit"
+                android:layout_marginRight="16dp"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/clock" />
+            <ImageView
+                android:id="@+id/tag"
+                android:layout_toLeftOf="@id/clock"
+                android:layout_marginRight="16dp"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/untag" />
 
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="0dp"
+                android:src="@drawable/close" />
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
     <HorizontalScrollView
+        android:id="@+id/button_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/black">
+        android:layout_alignParentBottom="true">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -16,28 +57,30 @@
 
             <ImageButton
                 android:id="@+id/action_undo"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/undo" />
 
             <ImageButton
                 android:id="@+id/action_redo"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
+                android:visibility="gone"
                 android:scaleType="fitCenter"
                 android:src="@drawable/redo" />
 
             <ImageButton
                 android:id="@+id/action_bold"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
@@ -46,8 +89,8 @@
 
             <ImageButton
                 android:id="@+id/action_italic"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
@@ -56,28 +99,30 @@
 
             <ImageButton
                 android:id="@+id/action_subscript"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/subscript" />
 
             <ImageButton
                 android:id="@+id/action_superscript"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/superscript" />
 
             <ImageButton
                 android:id="@+id/action_strikethrough"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
@@ -86,8 +131,8 @@
 
             <ImageButton
                 android:id="@+id/action_underline"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
@@ -96,39 +141,43 @@
 
             <ImageButton
                 android:id="@+id/action_heading1"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
+                android:visibility="gone"
                 android:scaleType="fitCenter"
                 android:src="@drawable/h1" />
 
             <ImageButton
                 android:id="@+id/action_heading2"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/h2" />
 
             <ImageButton
                 android:id="@+id/action_heading3"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
+                android:visibility="gone"
                 android:scaleType="fitCenter"
                 android:src="@drawable/h3" />
 
             <ImageButton
                 android:id="@+id/action_heading4"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
+                android:visibility="gone"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
@@ -136,9 +185,10 @@
 
             <ImageButton
                 android:id="@+id/action_heading5"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
+                android:visibility="gone"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
@@ -146,89 +196,97 @@
 
             <ImageButton
                 android:id="@+id/action_heading6"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/h6" />
 
             <ImageButton
                 android:id="@+id/action_txt_color"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/txt_color" />
 
             <ImageButton
                 android:id="@+id/action_bg_color"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/bg_color" />
 
 
             <ImageButton
                 android:id="@+id/action_indent"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/indent" />
 
             <ImageButton
                 android:id="@+id/action_outdent"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
+                android:visibility="gone"
                 android:scaleType="fitCenter"
                 android:src="@drawable/outdent" />
 
             <ImageButton
                 android:id="@+id/action_align_left"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/justify_left" />
 
             <ImageButton
                 android:id="@+id/action_align_center"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/justify_center" />
 
             <ImageButton
                 android:id="@+id/action_align_right"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/justify_right" />
 
             <ImageButton
                 android:id="@+id/action_insert_bullets"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
@@ -237,8 +295,8 @@
 
             <ImageButton
                 android:id="@+id/action_insert_numbers"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
@@ -247,68 +305,63 @@
 
             <ImageButton
                 android:id="@+id/action_blockquote"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/blockquote" />
 
             <ImageButton
                 android:id="@+id/action_insert_image"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/insert_image" />
 
             <ImageButton
                 android:id="@+id/action_insert_link"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@drawable/insert_link" />
 
             <ImageButton
                 android:id="@+id/action_insert_checkbox"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:padding="12dp"
                 android:scaleType="fitCenter"
+                android:visibility="gone"
                 android:src="@android:drawable/checkbox_on_background" />
 
         </LinearLayout>
     </HorizontalScrollView>
-
+    <EditText
+        style="@style/Base.V12.Widget.AppCompat.EditText"
+        android:id="@+id/title"
+        android:layout_below="@id/bar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="标题"/>
     <jp.wasabeef.richeditor.RichEditor
+        android:layout_below="@id/title"
+        android:layout_above="@id/button_content"
         android:id="@+id/editor"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="HTML Preview"
-        android:textSize="12sp" />
 
-    <Button
-        android:id="@+id/btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="确定"/>
-    <!--<TextView-->
-        <!--android:id="@+id/preview"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="15dp" />-->
-
-</LinearLayout>
+</RelativeLayout>

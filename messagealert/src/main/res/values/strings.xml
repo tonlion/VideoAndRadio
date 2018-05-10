@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MessageAlert</string>
+    <string name="app_name">超烦便签</string>
 
     <!-- Menu -->
     <string name="menu_undo">Undo</string>

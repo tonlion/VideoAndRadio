@@ -1,41 +1,49 @@
 package com.zhang.video.messagealert
 
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.app.WallpaperManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import jp.wasabeef.richeditor.RichEditor
 import kotlinx.android.synthetic.main.activity_rich.*
+import java.io.File
+import java.io.FileOutputStream
 
 class RichActivity : AppCompatActivity(){
 
     private lateinit var mEditor: RichEditor
     var width:Int = 0
     var height:Int = 0
+    @SuppressLint("NewApi")
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rich)
+        setSupportActionBar(bar)
+        bar.title = ""
+        startService(Intent(this,ScreenService::class.java))
         mEditor = findViewById<View>(R.id.editor) as RichEditor
-        mEditor.setEditorHeight(200)
-        mEditor.setEditorFontSize(16)
+        mEditor.setEditorFontSize(20)
         mEditor.setEditorFontColor(Color.BLACK)
         mEditor.setPadding(10, 10, 10, 10)
         mEditor.setPlaceholder("Insert text here...")
-        btn.setOnClickListener {
+        submit.setOnClickListener {
+//            this.findViewById<EditText>(R.id.title).focusable = View.FOCUSABLE
+            this.findViewById<EditText>(R.id.title).isFocusableInTouchMode = true
+            this.findViewById<EditText>(R.id.title).requestFocus()
             val view  = this.window.decorView
             view.isDrawingCacheEnabled = true
-//            view.measure(
-//                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-//                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//            view.layout(0, 0, view.measuredWidth,
-//                    view.measuredHeight);
             view.buildDrawingCache()
             var bitmap = view.drawingCache
             if (bitmap != null) {
@@ -47,7 +55,6 @@ class RichActivity : AppCompatActivity(){
                     return@setOnClickListener
                 }
             } else {
-                Log.e("正常显示：","我就是没有其他信息")
                 return@setOnClickListener;
             }
             var wall = WallpaperManager.getInstance(this)
@@ -58,23 +65,23 @@ class RichActivity : AppCompatActivity(){
             var canvas = Canvas(bm)
             canvas.drawColor(Color.WHITE)
             var paint = Paint()
-            paint.color = Color.BLACK
-            paint.textSize = 40f
-
             canvas.drawBitmap(bitmap, Rect(0,0,bitmap.width,bitmap.height),Rect(0,(this.resources.displayMetrics.heightPixels-bitmap.height)/2,bitmap.width,(this.resources.displayMetrics.heightPixels+bitmap.height)/2),paint)
             bitmap = null
             wall.setBitmap(bm)
-        }
-        val c = object : BroadcastReceiver() {
-            override fun onReceive(p0: Context?, p1: Intent?) {
-                if (intent.action.equals(Intent.ACTION_SCREEN_OFF)) {
-                    val mLockIntent = Intent(p0, LockScreenActivity::class.java)
-                    mLockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-                    startActivity(mLockIntent)
-                }
-            }
 
+            var file = File(Environment.getExternalStorageDirectory(),"temp.jpg")
+            var out = FileOutputStream(file)
+            bm.compress(Bitmap.CompressFormat.JPEG,100,out)
+            out.flush()
+            out.close()
+            bm = null
         }
+        clock.setOnClickListener {
+            var dialog = Dialog(this,android.R.style.Theme_Material_Light_Dialog)
+            dialog.setTitle("测试")
+            dialog.show()
+        }
+
         findViewById<View>(R.id.action_undo).setOnClickListener { mEditor.undo() }
 
         findViewById<View>(R.id.action_redo).setOnClickListener { mEditor.redo() }

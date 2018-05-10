@@ -37,4 +37,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.github.mthli:Knife:v1.1'
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
+    implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.google.android.gms:play-services-maps:15.0.1'
 }

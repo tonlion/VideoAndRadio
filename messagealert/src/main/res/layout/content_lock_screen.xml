@@ -7,5 +7,10 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".LockScreenActivity"
     tools:showIn="@layout/activity_lock_screen">
+    <ImageView
+        android:id="@+id/iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg"/>
 
 </android.support.constraint.ConstraintLayout>
