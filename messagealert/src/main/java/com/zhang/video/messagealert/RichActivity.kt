@@ -1,8 +1,7 @@
 package com.zhang.video.messagealert
 
 import android.annotation.SuppressLint
-import android.app.Dialog
-import android.app.WallpaperManager
+import android.app.*
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
@@ -11,76 +10,143 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.*
 import jp.wasabeef.richeditor.RichEditor
 import kotlinx.android.synthetic.main.activity_rich.*
+import kotlinx.android.synthetic.main.dialog_clock.view.*
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Exception
+import java.util.*
 
 class RichActivity : AppCompatActivity(){
 
     private lateinit var mEditor: RichEditor
     var width:Int = 0
     var height:Int = 0
+    lateinit var dialog:Dialog
+
+    var alertType = 0
+    @RequiresApi(Build.VERSION_CODES.N)
+
+    private val click = View.OnClickListener { v ->
+        when (v!!.id){
+            R.id.notification-> {
+//                Toast.makeText(this@RichActivity, "通知", Toast.LENGTH_LONG).show()
+                dialog.dismiss()
+                var time:StringBuffer = StringBuffer()
+                var calendar = Calendar.getInstance()
+                var dialog1 = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+                    time.append("${year}-${month}-${dayOfMonth}")
+                    var dialog2 = TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+                        time.append(" ${hourOfDay}:${minute}")
+                        time_display.text = time.toString()
+                        time_display.visibility = View.VISIBLE
+                    },calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE)
+                            ,true).show()
+                },calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)
+                        ,calendar.get(Calendar.DAY_OF_MONTH)).show()
+            }
+            R.id.screenoff->{
+                alertType = 1
+//                Toast.makeText(this@RichActivity,"锁屏",Toast.LENGTH_LONG).show()
+                dialog.dismiss()
+            }
+            R.id.wallpaper->{
+                alertType = 2
+//                Toast.makeText(this@RichActivity,"更换壁纸",Toast.LENGTH_LONG).show()
+                dialog.dismiss()
+            }
+            R.id.alert->{
+                alertType = 3
+//                Toast.makeText(this@RichActivity,"闹铃提醒",Toast.LENGTH_LONG).show()
+                dialog.dismiss()
+            }
+        }
+    }
     @SuppressLint("NewApi")
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rich)
         setSupportActionBar(bar)
-        bar.title = ""
-        startService(Intent(this,ScreenService::class.java))
         mEditor = findViewById<View>(R.id.editor) as RichEditor
         mEditor.setEditorFontSize(20)
         mEditor.setEditorFontColor(Color.BLACK)
         mEditor.setPadding(10, 10, 10, 10)
         mEditor.setPlaceholder("Insert text here...")
-        submit.setOnClickListener {
-//            this.findViewById<EditText>(R.id.title).focusable = View.FOCUSABLE
-            this.findViewById<EditText>(R.id.title).isFocusableInTouchMode = true
-            this.findViewById<EditText>(R.id.title).requestFocus()
-            val view  = this.window.decorView
-            view.isDrawingCacheEnabled = true
-            view.buildDrawingCache()
-            var bitmap = view.drawingCache
-            if (bitmap != null) {
-                val location = IntArray(2)
-                mEditor.getLocationOnScreen(location)
-                bitmap = Bitmap.createBitmap(bitmap, location[0], location[1], mEditor.width, mEditor.height)
-                if(bitmap.height>this.resources.displayMetrics.heightPixels-100){
-                    Toast.makeText(this,"当前文本过多，影响显示",Toast.LENGTH_LONG).show()
-                    return@setOnClickListener
-                }
-            } else {
-                return@setOnClickListener;
-            }
-            var wall = WallpaperManager.getInstance(this)
-            var c = ((wall.drawable)as BitmapDrawable).bitmap
-            width = c.width
-            height = c.height
-            var bm = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_4444)
-            var canvas = Canvas(bm)
-            canvas.drawColor(Color.WHITE)
-            var paint = Paint()
-            canvas.drawBitmap(bitmap, Rect(0,0,bitmap.width,bitmap.height),Rect(0,(this.resources.displayMetrics.heightPixels-bitmap.height)/2,bitmap.width,(this.resources.displayMetrics.heightPixels+bitmap.height)/2),paint)
-            bitmap = null
-            wall.setBitmap(bm)
 
-            var file = File(Environment.getExternalStorageDirectory(),"temp.jpg")
-            var out = FileOutputStream(file)
-            bm.compress(Bitmap.CompressFormat.JPEG,100,out)
-            out.flush()
-            out.close()
-            bm = null
+        submit.setOnClickListener {
+            if (mEditor.html == "") {
+                return@setOnClickListener
+            }
+            var helper = DataBase(this)
+            var db = helper.writableDatabase
+            try {
+                db.execSQL("insert into notes(title,desc,time,alerttime) values(?,?,?,?)"!!, arrayOf(title_main.text,mEditor.html,Date().time,0))
+            } catch (e:Exception){
+                Log.e("出错","${e.message}")
+            }
+            if (alertType == 0 ) {
+                this.findViewById<EditText>(R.id.title).isFocusableInTouchMode = true
+                this.findViewById<EditText>(R.id.title).requestFocus()
+                val view = this.window.decorView
+                view.isDrawingCacheEnabled = true
+                view.buildDrawingCache()
+                var bitmap = view.drawingCache
+                if (bitmap != null) {
+                    val location = IntArray(2)
+                    mEditor.getLocationOnScreen(location)
+                    bitmap = Bitmap.createBitmap(bitmap, location[0], location[1], mEditor.width, mEditor.height)
+                    if (bitmap.height > this.resources.displayMetrics.heightPixels - 100) {
+                        Toast.makeText(this, "当前文本过多，影响显示", Toast.LENGTH_LONG).show()
+                        return@setOnClickListener
+                    }
+                } else {
+                    return@setOnClickListener;
+                }
+                var wall = WallpaperManager.getInstance(this)
+                var c = ((wall.drawable) as BitmapDrawable).bitmap
+                width = c.width
+                height = c.height
+                var bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444)
+                var canvas = Canvas(bm)
+                canvas.drawColor(Color.WHITE)
+                var paint = Paint()
+                canvas.drawBitmap(bitmap, Rect(0, 0, bitmap.width, bitmap.height), Rect(0, (this.resources.displayMetrics.heightPixels - bitmap.height) / 2, bitmap.width, (this.resources.displayMetrics.heightPixels + bitmap.height) / 2), paint)
+                bitmap = null
+                if (alertType == 2)
+                    wall.setBitmap(bm)
+
+                var file = File(Environment.getExternalStorageDirectory(), "temp.jpg")
+                var out = FileOutputStream(file)
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                out.flush()
+                out.close()
+                bm = null
+                if (alertType == 1)
+                    startService(Intent(this, ScreenService::class.java))
+            }
+            finish()
         }
         clock.setOnClickListener {
-            var dialog = Dialog(this,android.R.style.Theme_Material_Light_Dialog)
-            dialog.setTitle("测试")
+            dialog = Dialog(this,android.R.style.Theme_Material_Light_Dialog)
+            val view = layoutInflater.inflate(R.layout.dialog_clock,null)
+            dialog.addContentView(view, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT))
+            view.notification.setOnClickListener(click)
+            view.alert.setOnClickListener(click)
+            view.screenoff.setOnClickListener(click)
+            view.wallpaper.setOnClickListener(click)
+            dialog.setTitle("提醒")
             dialog.show()
         }
+        back.setOnClickListener {
+            finish()
+        }
+
 
         findViewById<View>(R.id.action_undo).setOnClickListener { mEditor.undo() }
 

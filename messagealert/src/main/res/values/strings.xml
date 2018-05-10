@@ -22,4 +22,5 @@
     <string name="toast_insert_link">Insert link</string>
     <string name="toast_format_clear">Format clear</string>
     <string name="title_activity_lock_screen">LockScreenActivity</string>
+    <string name="title_activity_note">NoteActivity</string>
 </resources>

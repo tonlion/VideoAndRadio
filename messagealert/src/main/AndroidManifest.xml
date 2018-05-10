@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".RichActivity">
+        <activity android:name=".NoteActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,7 +31,15 @@
             android:label="@string/title_activity_lock_screen"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".RichActivity"
+            android:label="@string/title_activity_note"
+            android:theme="@style/AppTheme.NoActionBar" />
 
+        <service
+            android:name=".AlermService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
