@@ -2,7 +2,10 @@ package com.zhang.video.messagealert
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -12,45 +15,51 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.alibaba.fastjson.JSON
 
 import kotlinx.android.synthetic.main.activity_note.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
+import kotlin.math.log
 
 class NoteActivity : AppCompatActivity() {
 
     var adapter:NoteAdapter? = null
+    lateinit var notes:ArrayList<HashMap<String,Object>>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
         setSupportActionBar(toolbar)
         note_list.layoutManager = LinearLayoutManager(this)
-//        note_list.addItemDecoration(DividerItemDecoration(this, LinearLayout.VERTICAL))
         note_list.itemAnimator = DefaultItemAnimator()
-        var dbhelper = DataBase(this)
-        var db = dbhelper.writableDatabase
-        var cursor = db.rawQuery("select * from notes",null)
-        var notes = ArrayList<HashMap<String,Object>>()
+
+        notes = ArrayList<HashMap<String,Object>>()
         adapter = NoteAdapter(this,notes)
         note_list.adapter = adapter
-        while (cursor.moveToNext()) {
-            var map = HashMap<String,Object>()
-            map["title"] = cursor.getString(cursor.getColumnIndex("title")) as Object
-            map["desc"] = cursor.getString(cursor.getColumnIndex("desc")) as Object
-            map["time"] = cursor.getLong(cursor.getColumnIndex("time")) as Object
-            notes.add(map)
-        }
-        adapter!!.notifyDataSetChanged()
         fab.setOnClickListener { view ->
            var intent = Intent(this,RichActivity::class.java)
             startActivity(intent)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
+        notes.clear()
+        var dbhelper = DataBase(this)
+        var db = dbhelper.writableDatabase
+        var cursor = db.rawQuery("select * from notes order by id DESC"!!,null)
+        while (cursor.moveToNext()) {
+            var map = HashMap<String,Object>()
+            map["title"] = cursor.getString(cursor.getColumnIndex("title")) as Object
+            map["desc"] = cursor.getString(cursor.getColumnIndex("desc")) as Object
+            map["time"] = cursor.getLong(cursor.getColumnIndex("time")) as Object
+            notes.add(map)
 
-        Log.e("高度","${toolbar.measuredHeight}")
+        }
+        cursor.close()
+        db.close()
+        adapter!!.notifyDataSetChanged()
     }
     class NoteAdapter:RecyclerView.Adapter<NoteAdapter.ViewHolder>{
         var context:Context
@@ -72,20 +81,40 @@ class NoteActivity : AppCompatActivity() {
             return data.size
         }
 
+        @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             holder!!.title.text = data[position]["title"].toString()
-            holder!!.desc.text = data[position]["desc"].toString()
+            var desc = data[position]["desc"].toString()
+            var pattern = Pattern.compile("<[^>]*>")
+            var match = pattern.matcher(desc)
+            while (match.find()){
+                desc = desc.replace(match.group(),"")
+            }
+
+            holder!!.desc.text = desc
             var date = Date()
             date.time = (data[position]["time"] as Long)
             var format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
             holder!!.time.text =format.format(date)
+            holder.getView().setOnClickListener {
+                var intent = Intent(context,RichActivity::class.java)
+                intent.putExtra("detail",JSON.toJSONString(data[position]))
+                var option = ActivityOptionsCompat.makeScaleUpAnimation(it,it.x.toInt(),it.y.toInt(),it.width,it.height)
+
+                context.startActivity(intent,option.toBundle())
+
+            }
         }
 
         class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
             val title = itemView!!.findViewById<TextView>(R.id.note_title)!!
             val desc = itemView!!.findViewById<TextView>(R.id.note_desc)!!
             val time = itemView!!.findViewById<TextView>(R.id.note_time)!!
+
+            fun getView():View {
+                return itemView
+            }
         }
     }
 

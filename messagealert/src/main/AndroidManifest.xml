@@ -39,7 +39,9 @@
         <service
             android:name=".AlermService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".AlarmActivity"></activity>
     </application>
 
 </manifest>

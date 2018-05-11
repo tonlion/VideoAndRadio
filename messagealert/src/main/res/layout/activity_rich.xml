@@ -50,7 +50,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="0dp"
                 android:background="?android:selectableItemBackground"
-                android:src="@drawable/close" />
+                android:src="@drawable/back" />
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
     <HorizontalScrollView
@@ -367,13 +367,13 @@
         android:textSize="16sp"
         android:hint="标题"/>
     <TextView
-        android:layout_below="@+id/title_main"
+        android:layout_below="@id/title_main"
         android:id="@+id/time_display"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:textSize="14sp"
         android:visibility="gone"
-        android:text="2018-09-12 12:22:32"/>
+        android:text="0"/>
     <jp.wasabeef.richeditor.RichEditor
         android:layout_below="@id/time_display"
         android:layout_above="@id/button_content"

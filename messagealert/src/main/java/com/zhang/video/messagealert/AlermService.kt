@@ -1,14 +1,14 @@
 package com.zhang.video.messagealert
 
-import android.app.AlarmManager
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.annotation.SuppressLint
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.support.annotation.RequiresApi
+import android.util.Log
 
 class AlermService : Service() {
 
@@ -26,14 +26,18 @@ class AlermService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        var time = intent!!.getLongExtra("time",0)
+        var time = intent!!.getStringExtra("time").toLong()
         val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        var pintent = PendingIntent.getBroadcast(this,2, Intent(this,AlarmReceiver::class.java),0)
+        var int = Intent(this,AlarmReceiver::class.java)
+        int.putExtra("id",intent!!.getIntExtra("id",-1))
+        int.putExtra("type",intent!!.getIntExtra("type",-1))
+        var pintent = PendingIntent.getBroadcast(this,2, int,0)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
-
+            Log.e("这是高版本","显示吧")
             am.setExact(AlarmManager.RTC_WAKEUP,time,pintent)
         } else {
+            Log.e("这是低版本","显示吧")
             am.set(AlarmManager.RTC_WAKEUP,time,pintent)
         }
         return super.onStartCommand(intent, flags, startId)
@@ -52,8 +56,27 @@ class AlermService : Service() {
     }
 
     class AlarmReceiver : BroadcastReceiver(){
+        @SuppressLint("NewApi")
+        @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
         override fun onReceive(context: Context?, intent: Intent?) {
-            var notification  = Notification()
+            Log.e("出来吧","小同志")
+            if (intent!!.getIntExtra("id",-1) == 0) {
+                var id = intent.getIntExtra("id",-1)
+                var helper = DataBase(context!!)
+                var db = helper.readableDatabase
+                var cursor = db.rawQuery("select title,desc from notes where id = ?"!!, arrayOf("${id}"))
+                cursor.moveToFirst()
+                var nm = context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                var channel = nm.createNotificationChannel(NotificationChannel("200", "noti", NotificationManager.IMPORTANCE_HIGH))
+                var nb = Notification.Builder(context, "200").setContentTitle(cursor.getString(0)).setContentText(cursor.getString(1)).build()
+                nm.notify(1, nb)
+                cursor.close()
+                db.close()
+            } else {
+                var int = Intent(context,AlarmActivity::class.java)
+                int.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                context!!.startActivity(int)
+            }
         }
 
     }

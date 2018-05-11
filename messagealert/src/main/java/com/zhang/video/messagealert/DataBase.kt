@@ -14,7 +14,7 @@ class DataBase : SQLiteOpenHelper {
     constructor(context: Context) : super(context, DB_NAME, null, DB_VERSION) {}
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL("create table if not exists notes(id integer not null primary key autoincrement,title text not null,desc text not null,time varchar(20) not null,alerttime varchar(20) not null)"!!)
+        db.execSQL("create table if not exists notes(id integer not null primary key autoincrement,title text not null,desc text not null,time varchar(20) not null,alerttime varchar(20) not null,alerttype int not null)"!!)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

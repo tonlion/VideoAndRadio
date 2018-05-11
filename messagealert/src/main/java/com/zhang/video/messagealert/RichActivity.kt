@@ -10,16 +10,19 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.alibaba.fastjson.JSON
 import jp.wasabeef.richeditor.RichEditor
 import kotlinx.android.synthetic.main.activity_rich.*
 import kotlinx.android.synthetic.main.dialog_clock.view.*
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
+import java.text.SimpleDateFormat
 import java.util.*
 
 class RichActivity : AppCompatActivity(){
@@ -29,7 +32,7 @@ class RichActivity : AppCompatActivity(){
     var height:Int = 0
     lateinit var dialog:Dialog
 
-    var alertType = 0
+    var alertType = -1
     @RequiresApi(Build.VERSION_CODES.N)
 
     private val click = View.OnClickListener { v ->
@@ -37,18 +40,11 @@ class RichActivity : AppCompatActivity(){
             R.id.notification-> {
 //                Toast.makeText(this@RichActivity, "通知", Toast.LENGTH_LONG).show()
                 dialog.dismiss()
-                var time:StringBuffer = StringBuffer()
-                var calendar = Calendar.getInstance()
-                var dialog1 = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
-                    time.append("${year}-${month}-${dayOfMonth}")
-                    var dialog2 = TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
-                        time.append(" ${hourOfDay}:${minute}")
-                        time_display.text = time.toString()
-                        time_display.visibility = View.VISIBLE
-                    },calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE)
-                            ,true).show()
-                },calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)
-                        ,calendar.get(Calendar.DAY_OF_MONTH)).show()
+                getTime {
+                    time_display.text = it
+                    time_display.visibility = View.VISIBLE
+                    alertType = 0
+                }
             }
             R.id.screenoff->{
                 alertType = 1
@@ -61,11 +57,30 @@ class RichActivity : AppCompatActivity(){
                 dialog.dismiss()
             }
             R.id.alert->{
-                alertType = 3
+
 //                Toast.makeText(this@RichActivity,"闹铃提醒",Toast.LENGTH_LONG).show()
                 dialog.dismiss()
+                getTime {
+                    time_display.text = it
+                    time_display.visibility = View.VISIBLE
+                    alertType = 3
+                }
             }
         }
+    }
+    fun getTime(deal: (String) -> Unit){
+        var time:StringBuffer = StringBuffer()
+        var calendar = Calendar.getInstance()
+        var dialog1 = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+            time.append("${year}-${if((month+1)>10) month+1 else "0${month+1}"}-${if(dayOfMonth>10) dayOfMonth else "0${dayOfMonth}"}")
+            var dialog2 = TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+                time.append(" ${if(hourOfDay>10) hourOfDay else "0${hourOfDay}"}:${if (minute>10) minute else "0${minute}"}:00")
+                deal(time.toString())
+
+            },calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE)
+                    ,true).show()
+        },calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH)
+                ,calendar.get(Calendar.DAY_OF_MONTH)).show()
     }
     @SuppressLint("NewApi")
     @RequiresApi(Build.VERSION_CODES.N)
@@ -73,26 +88,52 @@ class RichActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rich)
         setSupportActionBar(bar)
+
         mEditor = findViewById<View>(R.id.editor) as RichEditor
-        mEditor.setEditorFontSize(20)
+        mEditor.setEditorFontSize(16)
         mEditor.setEditorFontColor(Color.BLACK)
         mEditor.setPadding(10, 10, 10, 10)
-        mEditor.setPlaceholder("Insert text here...")
+        mEditor.setPlaceholder("内容")
 
+        var intent = getIntent()
+        if (intent.getStringExtra("detail")!=null) {
+            var json = JSON.parseObject(intent.getStringExtra("detail"))
+            mEditor.html = json["desc"].toString()
+            title_main.setText(json["title"].toString())
+        }
         submit.setOnClickListener {
             if (mEditor.html == "") {
                 return@setOnClickListener
             }
             var helper = DataBase(this)
             var db = helper.writableDatabase
+            var alerttime = ""
+            if (time_display.text.length>3){
+                var format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                alerttime = "${format.parse(time_display.text.toString()).time}"
+            }
             try {
-                db.execSQL("insert into notes(title,desc,time,alerttime) values(?,?,?,?)"!!, arrayOf(title_main.text,mEditor.html,Date().time,0))
+                db.execSQL("insert into notes(title,desc,time,alerttime, alerttype) values(?,?,?,?,?)"!!, arrayOf(title_main.text,mEditor.html,Date().time,alerttime,alertType))
+                var cursor = db.rawQuery("SELECT last_insert_rowid()",null)
+                cursor.moveToFirst()
+                var id = cursor.getInt(0)
+                if(alertType == 0 || alertType == 3){
+                    var intent = Intent(this,AlermService::class.java)
+                    intent.putExtra("id",id)
+                    intent.putExtra("type",alertType)
+                    intent.putExtra("time",alerttime)
+                    startService(intent)
+                }
+//                id +=1
+                cursor.close()
             } catch (e:Exception){
                 Log.e("出错","${e.message}")
+            }finally {
+                db.close()
             }
             if (alertType == 0 ) {
-                this.findViewById<EditText>(R.id.title).isFocusableInTouchMode = true
-                this.findViewById<EditText>(R.id.title).requestFocus()
+                this.findViewById<EditText>(R.id.title_main).isFocusableInTouchMode = true
+                this.findViewById<EditText>(R.id.title_main).requestFocus()
                 val view = this.window.decorView
                 view.isDrawingCacheEnabled = true
                 view.buildDrawingCache()
