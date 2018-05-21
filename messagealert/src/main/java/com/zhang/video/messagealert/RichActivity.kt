@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -32,43 +31,40 @@ class RichActivity : AppCompatActivity(){
     var height:Int = 0
     lateinit var dialog:Dialog
 
+    var id = -1
+
     var alertType = -1
     @RequiresApi(Build.VERSION_CODES.N)
 
     private val click = View.OnClickListener { v ->
         when (v!!.id){
             R.id.notification-> {
-//                Toast.makeText(this@RichActivity, "通知", Toast.LENGTH_LONG).show()
                 dialog.dismiss()
                 getTime {
                     time_display.text = it
-                    time_display.visibility = View.VISIBLE
+                    time_content.visibility = View.VISIBLE
                     alertType = 0
                 }
             }
             R.id.screenoff->{
                 alertType = 1
-//                Toast.makeText(this@RichActivity,"锁屏",Toast.LENGTH_LONG).show()
                 dialog.dismiss()
             }
             R.id.wallpaper->{
                 alertType = 2
-//                Toast.makeText(this@RichActivity,"更换壁纸",Toast.LENGTH_LONG).show()
                 dialog.dismiss()
             }
             R.id.alert->{
-
-//                Toast.makeText(this@RichActivity,"闹铃提醒",Toast.LENGTH_LONG).show()
                 dialog.dismiss()
                 getTime {
                     time_display.text = it
-                    time_display.visibility = View.VISIBLE
+                    time_content.visibility = View.VISIBLE
                     alertType = 3
                 }
             }
         }
     }
-    fun getTime(deal: (String) -> Unit){
+    private fun getTime(deal: (String) -> Unit){
         var time:StringBuffer = StringBuffer()
         var calendar = Calendar.getInstance()
         var dialog1 = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
@@ -95,12 +91,20 @@ class RichActivity : AppCompatActivity(){
         mEditor.setPadding(10, 10, 10, 10)
         mEditor.setPlaceholder("内容")
 
-        var intent = getIntent()
+//        var intent = intentnt
         if (intent.getStringExtra("detail")!=null) {
             var json = JSON.parseObject(intent.getStringExtra("detail"))
             mEditor.html = json["desc"].toString()
             title_main.setText(json["title"].toString())
+            id = json["id"].toString().toInt()
         }
+        time_close.setOnClickListener(object :View.OnClickListener{
+            override fun onClick(v: View?) {
+                alertType = -1
+                time_display.text = "0"
+                time_content.visibility = View.GONE
+            }
+        })
         submit.setOnClickListener {
             if (mEditor.html == "") {
                 return@setOnClickListener
@@ -113,25 +117,28 @@ class RichActivity : AppCompatActivity(){
                 alerttime = "${format.parse(time_display.text.toString()).time}"
             }
             try {
-                db.execSQL("insert into notes(title,desc,time,alerttime, alerttype) values(?,?,?,?,?)"!!, arrayOf(title_main.text,mEditor.html,Date().time,alerttime,alertType))
-                var cursor = db.rawQuery("SELECT last_insert_rowid()",null)
-                cursor.moveToFirst()
-                var id = cursor.getInt(0)
-                if(alertType == 0 || alertType == 3){
-                    var intent = Intent(this,AlermService::class.java)
-                    intent.putExtra("id",id)
-                    intent.putExtra("type",alertType)
-                    intent.putExtra("time",alerttime)
-                    startService(intent)
+                if (id>-1) {
+                    db.execSQL("update notes set title=?,desc=?,time=?,alerttime=?,alerttype=? where id=?"!!, arrayOf(title_main.text,mEditor.html,Date().time,alerttime,alertType,id))
+                } else {
+                    db.execSQL("insert into notes(title,desc,time,alerttime, alerttype) values(?,?,?,?,?)"!!, arrayOf(title_main.text, mEditor.html, Date().time, alerttime, alertType))
+                    var cursor = db.rawQuery("SELECT last_insert_rowid()", null)
+                    cursor.moveToFirst()
+                    var id = cursor.getInt(0)
+                    if (alertType == 0 || alertType == 3) {
+                        var intent = Intent(this, AlermService::class.java)
+                        intent.putExtra("id", id)
+                        intent.putExtra("type", alertType)
+                        intent.putExtra("time", alerttime)
+                        startService(intent)
+                    }
+                    cursor.close()
                 }
-//                id +=1
-                cursor.close()
             } catch (e:Exception){
                 Log.e("出错","${e.message}")
             }finally {
                 db.close()
             }
-            if (alertType == 0 ) {
+            if (alertType != 0 ) {
                 this.findViewById<EditText>(R.id.title_main).isFocusableInTouchMode = true
                 this.findViewById<EditText>(R.id.title_main).requestFocus()
                 val view = this.window.decorView
@@ -188,75 +195,16 @@ class RichActivity : AppCompatActivity(){
             finish()
         }
 
-
-        findViewById<View>(R.id.action_undo).setOnClickListener { mEditor.undo() }
-
-        findViewById<View>(R.id.action_redo).setOnClickListener { mEditor.redo() }
-
         findViewById<View>(R.id.action_bold).setOnClickListener { mEditor.setBold() }
 
         findViewById<View>(R.id.action_italic).setOnClickListener { mEditor.setItalic() }
-
-        findViewById<View>(R.id.action_subscript).setOnClickListener { mEditor.setSubscript() }
-
-        findViewById<View>(R.id.action_superscript).setOnClickListener { mEditor.setSuperscript() }
 
         findViewById<View>(R.id.action_strikethrough).setOnClickListener { mEditor.setStrikeThrough() }
 
         findViewById<View>(R.id.action_underline).setOnClickListener { mEditor.setUnderline() }
 
-        findViewById<View>(R.id.action_heading1).setOnClickListener { mEditor.setHeading(1) }
-
-        findViewById<View>(R.id.action_heading2).setOnClickListener { mEditor.setHeading(2) }
-
-        findViewById<View>(R.id.action_heading3).setOnClickListener { mEditor.setHeading(3) }
-
-        findViewById<View>(R.id.action_heading4).setOnClickListener { mEditor.setHeading(4) }
-
-        findViewById<View>(R.id.action_heading5).setOnClickListener { mEditor.setHeading(5) }
-
-        findViewById<View>(R.id.action_heading6).setOnClickListener { mEditor.setHeading(6) }
-
-        findViewById<View>(R.id.action_txt_color).setOnClickListener(object : View.OnClickListener {
-            private var isChanged: Boolean = false
-
-            override fun onClick(v: View) {
-                mEditor.setTextColor(if (isChanged) Color.BLACK else Color.RED)
-                isChanged = !isChanged
-            }
-        })
-
-        findViewById<View>(R.id.action_bg_color).setOnClickListener(object : View.OnClickListener {
-            private var isChanged: Boolean = false
-
-            override fun onClick(v: View) {
-                mEditor.setTextBackgroundColor(if (isChanged) Color.TRANSPARENT else Color.YELLOW)
-                isChanged = !isChanged
-            }
-        })
-
-        findViewById<View>(R.id.action_indent).setOnClickListener { mEditor.setIndent() }
-
-        findViewById<View>(R.id.action_outdent).setOnClickListener { mEditor.setOutdent() }
-
-        findViewById<View>(R.id.action_align_left).setOnClickListener { mEditor.setAlignLeft() }
-
-        findViewById<View>(R.id.action_align_center).setOnClickListener { mEditor.setAlignCenter() }
-
-        findViewById<View>(R.id.action_align_right).setOnClickListener { mEditor.setAlignRight() }
-
-        findViewById<View>(R.id.action_blockquote).setOnClickListener { mEditor.setBlockquote() }
-
         findViewById<View>(R.id.action_insert_bullets).setOnClickListener { mEditor.setBullets() }
 
         findViewById<View>(R.id.action_insert_numbers).setOnClickListener { mEditor.setNumbers() }
-
-        findViewById<View>(R.id.action_insert_image).setOnClickListener {
-            mEditor.insertImage("http://www.1honeywan.com/dachshund/image/7.21/7.21_3_thumb.JPG",
-                    "dachshund")
-        }
-
-        findViewById<View>(R.id.action_insert_link).setOnClickListener { mEditor.insertLink("https://github.com/wasabeef", "wasabeef") }
-        findViewById<View>(R.id.action_insert_checkbox).setOnClickListener { mEditor.insertTodo() }
     }
 }

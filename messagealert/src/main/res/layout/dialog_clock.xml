@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:paddingBottom="8dp"
-        android:paddingTop="8dp"
+        android:paddingTop="16dp"
         android:text="状态栏通知" />
 
     <TextView
@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingBottom="8dp"
+        android:paddingBottom="20dp"
         android:paddingTop="8dp"
         android:text="闹铃提醒" />
 
